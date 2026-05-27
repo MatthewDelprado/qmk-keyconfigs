@@ -36,7 +36,7 @@ Chords use `LT()` (Layer-Tap) with `HOLD_ON_OTHER_KEY_PRESS` and `PERMISSIVE_HOL
 | K1 | Hyper+2 | Top-Center Sixth |
 | K2 | Hyper+3 | Top-Right Sixth |
 | K3 | F18 | Left Third |
-| K4 | Hyper+5 | Center Third |
+| K4 | Hyper+5 | Center Third | (plain key — no hold) |
 | K5 | F19 | Right Third |
 | K6 | Hyper+7 | Bottom-Left Sixth |
 | K7 | Hyper+8 | Bottom-Center Sixth |
@@ -61,13 +61,6 @@ Chords use `LT()` (Layer-Tap) with `HOLD_ON_OTHER_KEY_PRESS` and `PERMISSIVE_HOL
 |-------|--------|----------------|
 | K5 + K3 | Hyper+Return | Full Screen |
 | K5 + K4 | F20 | Right Two-Thirds |
-
-### Hold K4 (center anchor)
-
-| Chord | Output | Raycast target |
-|-------|--------|----------------|
-| K4 + K3 | Hyper+\ | Full Screen |
-| K4 + K5 | Hyper+\ | Full Screen |
 
 ### Hold K0 or K2 (top-row anchors, shared layer)
 
@@ -105,7 +98,6 @@ Open **Raycast → Extensions → Window Management**, click a shortcut field, a
 | Left Two-Thirds | F13 | K3+K4 |
 | Right Two-Thirds | F20 | K5+K4 |
 | Full Screen | Hyper+Return | K3+K5 · K5+K3 |
-| Full Screen | Hyper+\ | K4+K3 · K4+K5 |
 
 > **Hyper** = Ctrl+Shift+Alt+Cmd.
 
@@ -142,11 +134,10 @@ qmk flash -kb idyllic/pizzapad -km matt
 |-----|-------------|------------|
 | K0 | KC_F22 | Hyper+1 |
 | K2 | KC_F23 | Hyper+3 |
-| K4 | KC_PAUSE | Hyper+5 |
 | K6 | KC_F24 | Hyper+7 |
 | K8 | KC_SCRL | Hyper+9 |
 
-K3/K5 tap to plain F-keys (F18/F19) — no workaround needed. K1/K7 are plain keys.
+K3/K5 tap to plain F-keys (F18/F19) — no workaround needed. K1/K4/K7 are plain keys.
 
 ### Shared layers for symmetric pairs
 K0 and K2 share `_TOP_HOLD`; K6 and K8 share `_BOT_HOLD`. Sharing is intentional: with `HOLD_ON_OTHER_KEY_PRESS`, if both keys target the same layer, the second key pressing doesn't activate a *new* layer — it's a no-op since that layer is already active. This prevents the second key from becoming a conflicting anchor. Separate layers caused K2 to also register as held when K0 was held, preventing any keycode from firing.
@@ -159,7 +150,7 @@ K0 and K2 share `_TOP_HOLD`; K6 and K8 share `_BOT_HOLD`. Sharing is intentional
 | F17 | Brightness (macOS, some configs) |
 | F21+ | Not recognised by Raycast as recordable hotkeys |
 
-### Layers (6 total)
+### Layers (5 total)
 | Layer | Name | Trigger |
 |-------|------|---------|
 | 0 | `_BASE` | Always active |
@@ -167,7 +158,6 @@ K0 and K2 share `_TOP_HOLD`; K6 and K8 share `_BOT_HOLD`. Sharing is intentional
 | 2 | `_RIGHT_HOLD` | Hold K5 |
 | 3 | `_TOP_HOLD` | Hold K0 or K2 |
 | 4 | `_BOT_HOLD` | Hold K6 or K8 |
-| 5 | `_CENTER_HOLD` | Hold K4 |
 
 ### config.h
 - `HOLD_ON_OTHER_KEY_PRESS` — registers hold the instant another key is pressed

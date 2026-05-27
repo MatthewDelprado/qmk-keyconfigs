@@ -26,7 +26,7 @@
 //   K1: tap=HYPR+2    (plain, no hold)
 //   K2: tap=HYPR+3,   hold=_TOP_HOLD
 //   K3: tap=F18,      hold=_LEFT_HOLD
-//   K4: tap=HYPR+5,   hold=_CENTER_HOLD
+//   K4: tap=HYPR+5    (plain, no hold)
 //   K5: tap=F19,      hold=_RIGHT_HOLD
 //   K6: tap=HYPR+7,   hold=_BOT_HOLD
 //   K7: tap=HYPR+8    (plain, no hold)
@@ -50,10 +50,6 @@
 //   K6+K8 → F16          (Bottom Half)
 //   K8+K6 → F16          (Bottom Half)
 //
-// Layer 5 (_CENTER_HOLD — hold K4):
-//   K4+K3 → HYPR+\       (Full Screen — existing binding)
-//   K4+K5 → HYPR+\       (Full Screen — existing binding)
-//
 // Avoided F-keys: F14 (brightness down), F15 (brightness up), F17 (brightness).
 // F21+ not recognised by Raycast as recordable hotkeys.
 
@@ -64,15 +60,14 @@ enum custom_layers {
     _LEFT_HOLD,
     _RIGHT_HOLD,
     _TOP_HOLD,        // shared by K0 and K2 — same pattern as _BOT_HOLD for K6/K8
-    _BOT_HOLD,        // shared by K6 and K8
-    _CENTER_HOLD      // activated only by K4
+    _BOT_HOLD         // shared by K6 and K8
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_BASE] = LAYOUT_ortho_3x3(
         LT(_TOP_HOLD,   KC_F22),   HYPR(KC_2),   LT(_TOP_HOLD,   KC_F23),
-        LT(_LEFT_HOLD,      KC_F18),   LT(_CENTER_HOLD, KC_PAUSE),   LT(_RIGHT_HOLD,     KC_F19),
+        LT(_LEFT_HOLD,      KC_F18),   HYPR(KC_5),                   LT(_RIGHT_HOLD,     KC_F19),
         LT(_BOT_HOLD,       KC_F24),   HYPR(KC_8),   LT(_BOT_HOLD,       KC_SCRL)
     ),
 
@@ -105,13 +100,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_F16,           KC_TRNS,       KC_F16
     ),
 
-    // Hold K4 — K3 and K5 both trigger HYPR+\ (user's existing full-screen binding)
-    [_CENTER_HOLD] = LAYOUT_ortho_3x3(
-        KC_TRNS,          KC_TRNS,       KC_TRNS,
-        HYPR(KC_BSLS),    KC_TRNS,       HYPR(KC_BSLS),
-        KC_TRNS,          KC_TRNS,       KC_TRNS
-    )
-
 };
 
 // Intercept placeholder taps on corner keys and send the correct HYPR+num.
@@ -126,12 +114,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LT(_TOP_HOLD, KC_F23):             // K2 tap → HYPR+3
             if (record->tap.count && record->event.pressed) {
                 tap_code16(HYPR(KC_3));
-                return false;
-            }
-            break;
-        case LT(_CENTER_HOLD, KC_PAUSE):        // K4 tap → HYPR+5
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(HYPR(KC_5));
                 return false;
             }
             break;
