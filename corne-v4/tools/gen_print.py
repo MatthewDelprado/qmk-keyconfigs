@@ -46,7 +46,8 @@ for i in range(12): BASIC[0x3a + i] = f'F{i+1}'
 SPECIAL = {0x7c00:'Boot', 0x7c77:'Lower', 0x7c78:'Raise', 0x7820:'RGB', 0x7821:'Effect +', 0x7822:'Effect −', 0x7823:'Hue +', 0x7824:'Hue −',
  0x7825:'Sat +', 0x7826:'Sat −', 0x7827:'Bri +', 0x7828:'Bri −', 0x7829:'Speed +', 0x782a:'Speed −'}
 UNSH = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','-':'_','=':'+','[':'{',']':'}','\\':'|',';':':',"'":'"','`':'~',',':'<','.':'>','/':'?'}
-NAMES = {1:'Fn', 2:'Nav', 3:'Lighting'} if MODE == 'master' else {1:'L1', 2:'L2', 3:'L3', 4:'L4', 5:'L5'}
+MACRO = {0x7700: '⌘ ⌘', 0x7701: '⇧ ⇧'} if MODE == 'split' else {}
+NAMES = {1:'Fn', 2:'Nav', 3:'Lighting'} if MODE in ('master', 'split') else {1:'L1', 2:'L2', 3:'L3', 4:'L4', 5:'L5'}
 def mods(m):
     if m & 0x0f == 0x0f: return 'Hyper'
     return ''.join(s for b, s in ((1,'⌃'),(2,'⇧'),(4,'⌥'),(8,'⌘')) if m & b)
@@ -55,6 +56,7 @@ def label(v):
     if v == 0: return ('', '', 'none', '')
     if v == 1: return ('', '', '', '')
     if v in SPECIAL: return (SPECIAL[v], '', 'act', '')
+    if v in MACRO: return (MACRO[v], 'taps twice', 'act', '')
     if v < 0x100:
         b = BASIC.get(v, f'0x{v:02x}')
         kind = 'mod' if b in '⌃⇧⌥⌘' else 'act' if len(b) > 1 or b in '←→↑↓⏭⏮⏯' else 'key'
@@ -104,6 +106,17 @@ if MODE == 'master':
 Same rules as the master: home row mods (A ⇧, S ⌃, D ⌥, F ⌘ / J ⌘, K ⌥, L ⌃, ; ⇧), Hyper on Esc, Enter, G and H, symbols on Fn with mirrored brackets, HHKB arrows on Fn,
 numpad on Nav. Both inner thumbs are Space and hold Nav; with one held, the other is Backspace. The Corne has no ' [ ] column,
 so ' is Fn + G (as on every 40%). The extra keys are media: ⏯ and ⏭ on the left, Vol + and Vol − on the right. Fn + Space opens lighting, like Fn + Space on the master.'''
+elif MODE == 'split':
+    head = 'Corne v4 · master keymap, split thumbs (trial)'
+    body = (board(0, 'Base', 'always on', {})
+            + board(1, 'Fn', 'hold the Enter thumb', {(7, 5): 'Fn'})
+            + board(2, 'Nav', 'hold either middle thumb (Space)', {(3, 4): 'Space'})
+            + board(3, 'Lighting', 'hold Fn (Enter thumb), then the Delete thumb', {(7, 5): 'Fn', (3, 5): 'Del'}))
+    notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
+Same letters, mods and layers as the master; only the thumbs differ. Left to right: ⌘ ⌘, Space / Nav, Delete | Enter / Fn, Space / Nav, ⇧ ⇧.
+The outer thumbs are Vial macros 0 and 1: one press taps left ⌘ (or left ⇧) twice, 20 ms apart, for double-tap hotkeys. They don't hold as modifiers;
+the home row mods do that. Fn is held on the Enter thumb, and Fn + the Delete thumb opens lighting. On Nav the inner thumbs are Backspace and right outer is “.”.
+The standard thumbs (⌥ ⌘ Space | Space Fn ⌘, closest to the other boards) are kept in corne-v4-matt-target-standard-thumbs.json.'''
 else:
     head = 'Corne v4 · current keymap (as it arrived)'
     held = {1: {(3, 4): 'Lower'}, 2: {(7, 4): 'Raise'}, 3: {(3, 4): 'Lower', (7, 4): 'Raise'}}

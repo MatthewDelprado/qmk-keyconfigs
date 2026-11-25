@@ -14,5 +14,18 @@ try {
     if (now !== want) throw new Error(`L${l} r${r} c${c}: wrote 0x${want.toString(16)}, reads 0x${now.toString(16)}`);
     n++;
   })));
-  console.log(`wrote ${n} keys`);
+  // Macro buffer (optional): rewrite it if it differs, then read it back.
+  let m = 'unchanged';
+  if (t.macroBufferHex) {
+    const want = Buffer.from(t.macroBufferHex, 'hex'), have = [];
+    for (let off = 0; off < want.length; off += 28) { const k = Math.min(28, want.length - off); have.push(...cmd([0x0e, off >> 8, off & 255, k]).slice(4, 4 + k)); }
+    if (!want.equals(Buffer.from(have))) {
+      for (let off = 0; off < want.length; off += 28) { const k = Math.min(28, want.length - off); cmd([0x0f, off >> 8, off & 255, k, ...want.subarray(off, off + k)]); }
+      const now = [];
+      for (let off = 0; off < want.length; off += 28) { const k = Math.min(28, want.length - off); now.push(...cmd([0x0e, off >> 8, off & 255, k]).slice(4, 4 + k)); }
+      if (!want.equals(Buffer.from(now))) throw new Error('macro buffer did not take (is Vial locked?)');
+      m = 'rewritten';
+    }
+  }
+  console.log(`wrote ${n} keys, macros ${m}`);
 } finally { close(); }
