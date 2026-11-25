@@ -9,6 +9,8 @@ Custom QMK keymaps for Matt's keyboards. Source files live here; the QMK firmwar
 | Nickname(s) | Folder | QMK path | MCU | Layout | Notes |
 |---|---|---|---|---|---|
 | pretty paddy, pretty pad, paddy pad, pizza pad | `pretty-paddy/` | `keyboards/idyllic/pizzapad` | RP2040 (Seeed XIAO) | 3×3 ortho (9 keys) | Sold by MechStock AU. VIA name: "Pizza Pad". |
+| dropbear, dropbear 60, db60 solder, hot rod, pink slip (its HHKB case) | `dropbear60/` | `keyboards/kkatano/bakeneko60` | atmega32u4 (atmel-dfu) | 60% tsangan, split BS + RShift | Shows up as "Bakeneko 60" (USB `0x6A6A:0xCBDC`). Home row mods. Builds a `.hex`, not `.uf2`. |
+| agar, agar mini | `agar-mini/` | none (ZMK, not QMK) | wireless (BLE), MCU not checked | 40% with arrows, split 3u+3u space | KBDfans "Agar Mini BLE (USB)", USB `0x9D5B:0x2561`. Edited live via ZMK Studio; `agar-mini/tools/` scripts read and write it over serial. See `agar-mini/KEYMAP.md`. |
 
 ---
 
@@ -104,7 +106,7 @@ LT(_TOP_RIGHT_HOLD, KC_F23)   // K2 → activates layer 4 simultaneously → bro
 
 ### 3. Hold detection settings (config.h)
 
-Always include both in `config.h` for reliable chord detection:
+For macropad chord layouts (like Pretty Paddy), include both in `config.h` for reliable chord detection. **Do not use these on boards with home row mods** — they turn fast typing rolls into accidental modifiers. For home row mods use `FLOW_TAP_TERM` instead (see `dropbear60/`).
 
 ```c
 #define HOLD_ON_OTHER_KEY_PRESS   // register hold the instant another key is pressed
