@@ -52,9 +52,9 @@ def board(d,lid,names,title,how,held=None):
         keys.append(f'<div class="k {t}{" empty" if not m and t not in ("fw","none") else ""}" style="left:{k["x"]/W*100:.3f}%;top:{k.get("y",0)/H*100:.3f}%;width:{k["width"]/W*100:.3f}%;height:{k["height"]/H*100:.3f}%"><span>{shtag}<b{" class=sm" if len(m)>4 else ""}>{html.escape(m)}</b><i>{html.escape(s)}</i></span></div>')
     return f'<section><h3>{title}<small>{how}</small></h3><div class="kb" style="aspect-ratio:{W}/{H}">{"".join(keys)}</div></section>'
 now=json.load(open(NOW)); old=json.load(open(OLD))
-NN={1:'Fn',3:'Nav',4:'System',2:'Fn'}
+NN={1:'L1',2:'Nav',3:'Fn',4:'System'}
 ON={1:'L1',2:'L2',3:'L3',4:'L4'}
-p1=''.join(board(now,i,NN,t,h,hk) for i,t,h,hk in [(0,'Base','always on',None),(1,'Fn','hold the Fn key',{36:('Fn','held')}),(3,'Nav','hold either Space (the other one is Bksp)',{}),(4,'System','hold Fn + either Space',{36:('Fn','held'),39:('Space','either'),40:('Space','either')})])
+p1=''.join(board(now,i,NN,t,h,hk) for i,t,h,hk in [(0,'Base','always on',None),(3,'Fn','hold the Fn key, or both Spaces',{36:('Fn','held')}),(2,'Nav','hold either Space (the other one taps Bksp, holds Fn)',{}),(4,'System','hold Fn + either Space',{36:('Fn','held'),39:('Space','either'),40:('Space','either')})])
 p2=''.join(board(old,i,ON,f'Layer {i}','') for i in range(5))
 open(OUT,'w').write(f'''<!doctype html><meta charset=utf-8><title>Agar Mini keymap</title><style>
 @page{{size:letter landscape;margin:.4in}}
@@ -76,7 +76,7 @@ footer{{margin-top:12px;color:#444;font-size:10px;line-height:1.45}}footer b{{co
 </style>
 <div class="page"><header><h1>KBDfans Agar Mini BLE · master keymap</h1><p>ZMK Studio · written 2026-11-22</p></header>
 <div class="grid">{p1}</div>
-<footer><b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to the layer below. <b>/</b> is Fn + the key after P and <b>?</b> is Fn + comma. Del is Nav + Bksp, with = beside it. Both Shifts stay Shift on Nav. Hold either Space for Nav; while one Space is held, the other is Backspace. Media is on Fn: Enter ⏯, Bksp ⏭, Right Shift Vol+, right ⌃ Vol−, right ⌘ Mute. Hold Fn + either Space for System: USB and Bluetooth 1–3. Brackets mirror under the index and middle fingers: [ ] on R U, {{ }} on D K, ( ) on F J. Striped keys were set in firmware, so ZMK Studio can't show or change them. (ZMK layer 2 is no longer used.)
+<footer><b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to the layer below. <b>/</b> is Fn + the key after P and <b>?</b> is Fn + comma. Del is Nav + Bksp, with = beside it. Both Shifts stay Shift on Nav. Hold either Space for Nav; while one Space is held, the other is Backspace on a tap and Fn on a hold (Fn is the higher layer, so it wins). Media is on Fn: Enter ⏯, Bksp ⏭, Right Shift Vol+, right ⌃ Vol−, right ⌘ Mute. Hold Fn + either Space for System: USB and Bluetooth 1–3. Brackets mirror under the index and middle fingers: [ ] on R U, {{ }} on D K, ( ) on F J. Striped keys were set in firmware, so ZMK Studio can't show or change them. (Since 2026-11-27 Nav is ZMK layer 2 and Fn layer 3, so Fn sits above Nav; layer 1 is no longer used.)
 <div class="legend"><span><i style="background:#ececec"></i>modifier / layer</span><span><i style="background:#e3edf9;border-color:#8fb0d8"></i>action</span><span><i style="background:#222;border-color:#222"></i>held to reach this layer</span><span><i style="border-style:dashed"></i>pass-through</span><span><i style="background:#f6f6f6;border-color:#ddd"></i>does nothing</span><span><i style="background:repeating-linear-gradient(45deg,#fff 0 3px,#eee 3px 6px)"></i>firmware</span></div></footer></div>
 <div class="page"><header><h1>Before: Agar Mini as it was</h1><p>Backup saved 2026-11-22 · agar-mini/backup/</p></header>
 <div class="grid old">{p2}</div>

@@ -12,10 +12,14 @@ The Agar Mini runs ZMK, not QMK. The keymap lives on the board and is edited liv
 | ZMK layer | Name | Reached by |
 |---|---|---|
 | 0 | Base | always on |
-| 1 | Fn (symbols, arrows, media) | hold the 1u Fn key right of Right Shift |
-| 2 | unused | was a Fn copy for the Fn key, before 2026-11-22 evening |
-| 3 | Nav | hold either Space; the other Space becomes Bksp. Del is on the Bksp key, = beside it; both Shifts stay Shift |
+| 1 | unused | a leftover Fn copy |
+| 2 | Nav | hold either Space; the other Space taps Bksp and holds Fn. Del is on the Bksp key, = beside it; both Shifts stay Shift |
+| 3 | Fn (symbols, arrows, media) | hold the 1u Fn key right of Right Shift, or hold both Spaces |
 | 4 | System (USB, Bluetooth 1–3, media) | Fn + either Space; stock apart from BT 3 on L, with the arrows, Bksp, Home and End cleared |
+
+Nav sits below Fn on purpose (target changed 2026-11-27; before, Fn was layer 1 and Nav layer 3): when both are on, the higher
+layer wins, so holding one Space for Nav and then the other for Fn gives the whole Fn layer. `KEYMAP.pdf` shows the board as it
+was last read; rebuild it after writing the target.
 
 Media on Fn: Enter ⏯, Bksp ⏭, Right Shift Vol+, right ⌃ Vol−, right ⌘ Mute. ? is Fn + comma.
 

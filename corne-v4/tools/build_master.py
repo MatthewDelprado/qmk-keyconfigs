@@ -1,8 +1,10 @@
 """Build the master keymap for the Corne v4 as a VIA keymap target: python3 build_master.py BACKUP.json OUT.json [standard|split]
 standard: thumbs ⌥ ⌘ Space/Nav | Space/Nav Fn ⌘, the closest match to the other boards.
-split:    thumbs ⌘⌘ Space/Nav Del | Enter/Fn Space/Nav ⇧⇧. The outer keys are macros that tap left ⌘ (or left ⇧) twice, for
+split:    thumbs ⌘⌘ Space/Nav Bksp | Enter/Fn Space/Nav ⇧⇧. The outer keys are macros that tap left ⌘ (or left ⇧) twice, for
           double-tap hotkeys; Fn is held on the Enter thumb.
-Layers 0-3 are Base / Fn / Nav / Lighting; layers 4-5 are kept from BACKUP (nothing reaches them).
+Layers 0-3 are Base / Nav / Fn / Lighting; layers 4-5 are kept from BACKUP (nothing reaches them). Nav sits below Fn so
+that with one Space thumb held (Nav), holding the other Space thumb (tap Backspace, hold Fn) gives the whole Fn layer:
+the higher layer wins. (Before 2026-11-27, Fn was layer 1 and Nav layer 2.)
 Matrix: left half rows 0-3, right half rows 4-7. Column 0 is the outer column on both halves, 5 the inner
 (T G B / Y H N), 6 the extra inner keys (rows 0-1). Thumbs are row 3 / 7, columns 3 (outer) 4 (middle) 5 (inner)."""
 import json, sys, copy
@@ -27,19 +29,21 @@ def lt(layer, k): return 0x4000 | layer << 8 | K[k]
 def mo(layer): return 0x5220 | layer
 def k(x): return K[x] if isinstance(x, str) else x
 HYPR_ESC, HYPR_ENT = mt(0x0f, 'Esc'), mt(0x0f, 'Enter')
-SPC_NAV, CMD_H = lt(2, 'Space'), 0x0800 | K['H']
-ENT_FN, M0, M1 = lt(1, 'Enter'), 0x7700, 0x7701   # M0 / M1: Vial macros 0 and 1
+NAV, FN = 1, 2
+SPC_NAV, CMD_H = lt(NAV, 'Space'), 0x0800 | K['H']
+BKSP_FN = lt(FN, 'Bksp')                  # on Nav: the other Space thumb
+ENT_FN, M0, M1 = lt(FN, 'Enter'), 0x7700, 0x7701   # M0 / M1: Vial macros 0 and 1
 
 # Vial macro buffer (NUL-separated). 01 01 kc = tap kc; 01 04 lo hi = delay (lo-1)+(hi-1)*255 ms.
 def double_tap(kc): return bytes([1, 1, kc, 1, 4, 21, 1, 1, 1, kc, 0])   # tap, 20 ms, tap
 MACROS = double_tap(K['LGui']) + double_tap(K['LSft']) if THUMBS == 'split' else b''
 
 if THUMBS == 'standard':
-    THUMB = dict(base=(['LAlt', 'LGui', SPC_NAV], [SPC_NAV, mo(1), 'RGui']),
-                 fn=([T, T, mo(3)], [mo(3), T, 'Mute']), nav=([T, T, 'Bksp'], ['Bksp', T, '.']))
+    THUMB = dict(base=(['LAlt', 'LGui', SPC_NAV], [SPC_NAV, mo(FN), 'RGui']),
+                 fn=([T, T, mo(3)], [mo(3), T, 'Mute']), nav=([T, T, BKSP_FN], [BKSP_FN, T, '.']))
 else:
-    THUMB = dict(base=([M0, SPC_NAV, 'Del'], [ENT_FN, SPC_NAV, M1]),
-                 fn=([T, T, mo(3)], [T, T, 'Mute']), nav=([T, T, 'Bksp'], ['Bksp', T, '.']))
+    THUMB = dict(base=([M0, SPC_NAV, 'Bksp'], [ENT_FN, SPC_NAV, M1]),     # left inner was Del until 2026-11-27 (changed in Vial)
+                 fn=([T, T, mo(3)], [T, T, 'Mute']), nav=([T, BKSP_FN, 'Bksp'], ['Bksp', BKSP_FN, '.']))
 
 def layer(left, right, lthumb, rthumb, lex, rex):
     """left/right: 3 rows of 6 keys, read left-to-right as you look at the board.
@@ -95,7 +99,7 @@ light = layer(
     [T, T], [T, T])
 
 out = copy.deepcopy(src)
-out['keymap'][:4] = [base, fn, nav, light]
+out['keymap'][:4] = [base, nav, fn, light]
 size = len(src['macroBufferHex']) // 2
 out['macroBufferHex'] = (MACROS + bytes(size - len(MACROS))).hex()
 out.pop('savedAt', None); out['note'] = f'master keymap target for the Corne v4 ({THUMBS} thumbs, layers 0-3); layers 4-5 kept from the backup'

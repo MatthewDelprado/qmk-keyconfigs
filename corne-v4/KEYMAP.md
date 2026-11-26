@@ -9,13 +9,16 @@ Edited live over VIA with the tools in `../qk-alice/tools` (VID=0x4653 PID=0x000
   closest to the other boards. Built by `tools/build_master.py BACKUP OUT standard` (picture: `PROPOSAL.pdf`);
   readback in `backup/corne-v4-vial-master-2026-11-25.json`.
 - `corne-v4-matt-target-split-thumbs.json`: the same keymap with split thumbs, on the board for a trial since 2026-11-25:
-  ⌘⌘, Space/Nav, Delete | Enter (hold Fn), Space/Nav, ⇧⇧. The outer thumbs are Vial macros 0 and 1, which tap left ⌘ or left ⇧
+  ⌘⌘, Space/Nav, Backspace | Enter (hold Fn), Space/Nav, ⇧⇧. The outer thumbs are Vial macros 0 and 1, which tap left ⌘ or left ⇧
   twice for double-tap hotkeys. Built with `... split` (picture: `KEYMAP-split-thumbs.pdf`); readback in
-  `backup/corne-v4-vial-split-thumbs-2026-11-25.json`. Writing macros needs Vial unlocked (hold Tab + Q when asked).
+  `backup/corne-v4-vial-split-thumbs-2026-11-27.json` (the 2026-11-25 one is from before the Nav/Fn swap). Writing macros needs Vial unlocked (hold Tab + Q when asked).
 - Switch between them with `node ../qk-alice/tools/apply.cjs <target>`; it also rewrites the macro buffer.
 
 Hyper on G and H as well as Esc and Enter (master rule, 2026-11-25).
-Layers: 0 Base, 1 Fn, 2 Nav (hold a Space thumb), 3 Lighting (from Fn). Standard thumbs: Fn is the right middle thumb, Nav either inner thumb.
-Split thumbs: Fn is held on the Enter thumb, Nav on either middle thumb, Lighting is Fn + the Delete thumb.
+Layers: 0 Base, 1 Nav (hold a Space thumb), 2 Fn, 3 Lighting (from Fn). Standard thumbs: Fn is the right middle thumb, Nav either inner thumb.
+With one Space thumb held for Nav, the other Space thumb is Backspace on a tap and Fn on a hold. Nav sits below Fn on purpose:
+the higher layer wins, so holding both Space thumbs gives the whole Fn layer. (Fn and Nav swapped numbers on 2026-11-27; the
+2026-11-25 readbacks in `backup/` are from before the swap.)
+Split thumbs: Fn is held on the Enter thumb, Nav on either middle thumb, Lighting is Fn + the Backspace thumb. (The left inner thumb was Delete until 2026-11-27, when it was changed to Backspace in Vial.)
 Layers 4 and 5 are the factory ones and nothing reaches them.
 Home row mods run on Vial's tapping term (200 ms); this firmware has no Flow Tap.

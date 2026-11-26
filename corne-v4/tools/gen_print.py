@@ -1,6 +1,7 @@
 """Printable sheet of a Corne v4 keymap: python3 gen_print.py KEYMAP.json OUT.html [current|master]
 KEYMAP.json is a VIA dump (qk-alice/tools/dump.cjs) or a target from build_master.py; both use
 QMK's modern keycodes (Vial protocol 6). Key positions come from the board's own Vial definition."""
+from datetime import datetime
 import json, sys, html, lzma, math, os
 SRC, OUT = sys.argv[1:3]
 MODE = sys.argv[3] if len(sys.argv) > 3 else 'current'
@@ -47,7 +48,7 @@ SPECIAL = {0x7c00:'Boot', 0x7c77:'Lower', 0x7c78:'Raise', 0x7820:'RGB', 0x7821:'
  0x7825:'Sat +', 0x7826:'Sat −', 0x7827:'Bri +', 0x7828:'Bri −', 0x7829:'Speed +', 0x782a:'Speed −'}
 UNSH = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','-':'_','=':'+','[':'{',']':'}','\\':'|',';':':',"'":'"','`':'~',',':'<','.':'>','/':'?'}
 MACRO = {0x7700: '⌘ ⌘', 0x7701: '⇧ ⇧'} if MODE == 'split' else {}
-NAMES = {1:'Fn', 2:'Nav', 3:'Lighting'} if MODE in ('master', 'split') else {1:'L1', 2:'L2', 3:'L3', 4:'L4', 5:'L5'}
+NAMES = {1:'Nav', 2:'Fn', 3:'Lighting'} if MODE in ('master', 'split') else {1:'L1', 2:'L2', 3:'L3', 4:'L4', 5:'L5'}
 def mods(m):
     if m & 0x0f == 0x0f: return 'Hyper'
     return ''.join(s for b, s in ((1,'⌃'),(2,'⇧'),(4,'⌥'),(8,'⌘')) if m & b)
@@ -99,23 +100,23 @@ def board(lid, title, how, held):
 if MODE == 'master':
     head = 'Corne v4 · master keymap (proposal)'
     body = (board(0, 'Base', 'always on', {})
-            + board(1, 'Fn', 'hold the right middle thumb', {(7, 4): 'Fn'})
-            + board(2, 'Nav', 'hold either inner thumb (Space)', {(3, 5): 'Space'})
+            + board(2, 'Fn', 'hold the right middle thumb, or both inner thumbs', {(7, 4): 'Fn'})
+            + board(1, 'Nav', 'hold either inner thumb (Space)', {(3, 5): 'Space'})
             + board(3, 'Lighting', 'hold Fn, then either inner thumb', {(7, 4): 'Fn', (3, 5): 'Space'}))
     notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
 Same rules as the master: home row mods (A ⇧, S ⌃, D ⌥, F ⌘ / J ⌘, K ⌥, L ⌃, ; ⇧), Hyper on Esc, Enter, G and H, symbols on Fn with mirrored brackets, HHKB arrows on Fn,
-numpad on Nav. Both inner thumbs are Space and hold Nav; with one held, the other is Backspace. The Corne has no ' [ ] column,
+numpad on Nav. Both inner thumbs are Space and hold Nav; with one held, the other is Backspace on a tap and Fn on a hold. The Corne has no ' [ ] column,
 so ' is Fn + G (as on every 40%). The extra keys are media: ⏯ and ⏭ on the left, Vol + and Vol − on the right. Fn + Space opens lighting, like Fn + Space on the master.'''
 elif MODE == 'split':
     head = 'Corne v4 · master keymap, split thumbs (trial)'
     body = (board(0, 'Base', 'always on', {})
-            + board(1, 'Fn', 'hold the Enter thumb', {(7, 5): 'Fn'})
-            + board(2, 'Nav', 'hold either middle thumb (Space)', {(3, 4): 'Space'})
-            + board(3, 'Lighting', 'hold Fn (Enter thumb), then the Delete thumb', {(7, 5): 'Fn', (3, 5): 'Del'}))
+            + board(2, 'Fn', 'hold the Enter thumb, or both middle thumbs', {(7, 5): 'Fn'})
+            + board(1, 'Nav', 'hold either middle thumb (Space)', {(3, 4): 'Space'})
+            + board(3, 'Lighting', 'hold Fn (Enter thumb), then the Backspace thumb', {(7, 5): 'Fn', (3, 5): 'Bksp'}))
     notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
-Same letters, mods and layers as the master; only the thumbs differ. Left to right: ⌘ ⌘, Space / Nav, Delete | Enter / Fn, Space / Nav, ⇧ ⇧.
+Same letters, mods and layers as the master; only the thumbs differ. Left to right: ⌘ ⌘, Space / Nav, Backspace | Enter / Fn, Space / Nav, ⇧ ⇧.
 The outer thumbs are Vial macros 0 and 1: one press taps left ⌘ (or left ⇧) twice, 20 ms apart, for double-tap hotkeys. They don't hold as modifiers;
-the home row mods do that. Fn is held on the Enter thumb, and Fn + the Delete thumb opens lighting. On Nav the inner thumbs are Backspace and right outer is “.”.
+the home row mods do that. Fn is held on the Enter thumb, and Fn + the Backspace thumb opens lighting. On Nav the inner thumbs are Backspace, the other Space thumb is Backspace on a tap and Fn on a hold, and right outer is “.”.
 The standard thumbs (⌥ ⌘ Space | Space Fn ⌘, closest to the other boards) are kept in corne-v4-matt-target-standard-thumbs.json.'''
 else:
     head = 'Corne v4 · current keymap (as it arrived)'
@@ -131,7 +132,7 @@ header{{display:flex;justify-content:space-between;align-items:baseline;border-b
 .grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}}h3{{font-size:13px;margin:0 0 4px}}h3 small{{font-weight:400;color:#666;margin-left:8px;font-size:10.5px}}
 svg{{width:100%;display:block}}footer{{margin-top:10px;color:#444;font-size:10px;line-height:1.45}}footer b{{color:#111}}
 .legend{{display:flex;gap:12px;margin-top:6px}}.legend span{{display:inline-flex;align-items:center;gap:4px}}.legend i{{display:inline-block;width:14px;height:10px;border:1px solid #999;border-radius:2px}}
-</style><header><h1>{head}</h1><p>{"read off the board " + d["savedAt"][:10] if "savedAt" in d else "target, not yet read back"}</p></header>
+</style><header><h1>{head}</h1><p>{"read off the board " + datetime.fromisoformat(d["savedAt"].replace("Z", "+00:00")).astimezone().strftime("%Y-%m-%d") if "savedAt" in d else "target, not yet read back"}</p></header>
 <div class="grid">{body}</div><footer>{notes}
 <div class="legend"><span><i style="background:#ececec"></i>modifier / layer</span><span><i style="background:#e3edf9;border-color:#8fb0d8"></i>action</span><span><i style="background:#222;border-color:#222"></i>held to reach this layer</span><span><i style="border-style:dashed"></i>pass-through</span><span><i style="background:#f6f6f6;border-color:#ddd"></i>does nothing</span></div>
 </footer>''')
