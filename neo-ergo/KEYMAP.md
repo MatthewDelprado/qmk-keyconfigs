@@ -11,11 +11,13 @@ Edited live over VIA with the tools in `../qk-alice/tools` (VID=0x4e45 PID=0x455
 - `backup/neo-ergo-via-backup-2026-11-26.json`: the keymap before the master (picture: `KEYMAP-current.pdf`).
   Put it back with `node ../qk-alice/tools/apply.cjs backup/neo-ergo-via-backup-2026-11-26.json`.
 - `neo-ergo-matt-target.json`: the master keymap, built by `tools/build_master.py` (proposal: `PROPOSAL.pdf`).
-  On the board since 2026-11-26; readback in `backup/neo-ergo-via-master-2026-11-26.json` (picture: `KEYMAP.pdf`,
-  orange = changed from the old keymap).
+  On the board since 2026-11-26; current readback in `backup/neo-ergo-via-master-2026-11-27.json` (picture: `KEYMAP.pdf`,
+  orange = changed from the old keymap). The 2026-11-26 readback is the first version, before Nav and Fn swapped.
 
-Layers: 0 Base, 1 Fn (key right of Right Shift, or the left column's bottom two keys), 2 Nav (hold either Space half;
-the other half is Backspace), 3 Lighting (Fn + Space).
+Layers: 0 Base, 1 Nav (hold either Space half), 2 Fn (key right of Right Shift, or the left column's bottom two keys),
+3 Lighting (Fn + Space). With one Space half held for Nav, the other half is Backspace on a tap and Fn on a hold.
+Nav sits below Fn on purpose: when both are on, the higher layer wins, so holding both halves gives the whole Fn layer.
+To repeat Backspace from Nav, tap the other half and then hold it (or hold the Backspace at Nav's top left).
 Board-only keys kept from before: the left column (Vol +, Vol −, ⏯ / hold Fn, Fn), ⌃ bottom-left, the right-hand B,
 and ← (hold ⌥) / → (hold ⌃) bottom-right. Macro 0 (⌥ + `) is still stored but not on any key.
 Dropped from the old Fn layer: F7–F9, F11, F12, PrtSc, Caps. VIA can't set Flow Tap, so the home row mods run on the

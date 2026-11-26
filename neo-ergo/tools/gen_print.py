@@ -2,6 +2,7 @@
 KEYMAP.json is a VIA dump (qk-alice/tools/dump.cjs) or a target from build_master.py (VIA protocol 12 keycodes).
 Key positions come from Neo Studio's VIA definition, with the layout options stored in KEYMAP.json.
 With COMPARE.json, every key that differs from it gets an orange outline (what applying KEYMAP.json would change)."""
+from datetime import datetime
 import json, sys, html, math, os
 SRC, OUT = sys.argv[1:3]
 MODE = sys.argv[3] if len(sys.argv) > 3 else 'current'
@@ -64,7 +65,9 @@ for i in range(12): BASIC[0x3a + i] = f'F{i+1}'
 SPECIAL = {0x7c00:'Boot', 0x7013:'NKRO', 0x7820:'RGB', 0x7821:'Effect +', 0x7822:'Effect −', 0x7823:'Hue +', 0x7824:'Hue −',
  0x7825:'Sat +', 0x7826:'Sat −', 0x7827:'Bri +', 0x7828:'Bri −', 0x7829:'Speed +', 0x782a:'Speed −'}
 UNSH = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','-':'_','=':'+','[':'{',']':'}','\\':'|',';':':',"'":'"','`':'~',',':'<','.':'>','/':'?'}
-NAMES = {1:'Fn', 2:'Nav', 3:'Lighting'} if MODE == 'master' else {1:'L1', 2:'L2', 3:'L3'}
+NAMES = {1:'Nav', 2:'Fn', 3:'Lighting'} if MODE == 'master' else {1:'L1', 2:'L2', 3:'L3'}
+# The master has Nav on 1 and Fn on 2; the old keymap's Fn-like layer was 1, so compare across that swap.
+CMP_LAYER = [0, 2, 1, 3] if MODE == 'master' else [0, 1, 2, 3]
 def mods(m):
     if m & 0x0f == 0x0f: return 'Hyper'
     side = 'R' if m & 0x10 else ''
@@ -97,7 +100,7 @@ def board(lid, title, how, held):
     for k in keys:
         x, y, w, h, r, rx, ry, (row, col) = k
         m, s, t, sh = label(km[lid][row][col])
-        changed = CMP is not None and CMP[lid][row][col] != km[lid][row][col]
+        changed = CMP is not None and CMP[CMP_LAYER[lid]][row][col] != km[lid][row][col]
         if (row, col) in held: m, s, t, sh = held[(row, col)], 'held', 'held', ''
         n += changed
         dash = ' stroke-dasharray="3 2"' if t == '' else ''
@@ -122,12 +125,12 @@ def board(lid, title, how, held):
 if MODE == 'master':
     head = 'Neo Ergo · master keymap'
     body = (board(0, 'Base', 'always on', {})
-            + board(1, 'Fn', 'hold Fn (right of Right Shift, or either Fn on the left column)', {(3, 14): 'Fn'})
-            + board(2, 'Nav', 'hold either Space', {(4, 6): 'Space'})
+            + board(2, 'Fn', 'hold Fn (right of Right Shift, or either Fn on the left column), or hold both Space halves', {(3, 14): 'Fn'})
+            + board(1, 'Nav', 'hold either Space', {(4, 6): 'Space'})
             + board(3, 'Lighting', 'hold Fn, then either Space', {(3, 14): 'Fn', (4, 6): 'Space'}))
     notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
 <b>Orange outline</b> = changes from what's on the board now. Same as the master: home row mods (A ⇧, S ⌃, D ⌥, F ⌘ / J ⌘, K ⌥, L ⌃, ; ⇧), Hyper on Esc, Enter, G and H,
-symbols on Fn with mirrored brackets, HHKB arrows on Fn, media on Fn's top row and right edge, numpad on Nav. Both Space halves hold Nav; with one held, the other is Backspace.
+symbols on Fn with mirrored brackets, HHKB arrows on Fn, media on Fn's top row and right edge, numpad on Nav. Both Space halves hold Nav; with one held, the other is Backspace on a tap and Fn on a hold (Fn is the higher layer, so it wins over Nav).
 Neo Ergo extras, kept as they are now: the left column (Vol +, Vol −, ⏯ that holds Fn, Fn), ⌃ bottom-left, the right-hand B, and ← (hold ⌥) and → (hold ⌃) bottom-right.
 Lighting drives the underglow (rgblight) with the same key spots as the master, plus NKRO on G. VIA can't set Flow Tap, so the home row mods run on this firmware's tapping term.'''
 else:
@@ -141,7 +144,7 @@ header{{display:flex;justify-content:space-between;align-items:baseline;border-b
 .grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}}h3{{font-size:13px;margin:0 0 4px}}h3 small{{font-weight:400;color:#666;margin-left:8px;font-size:10.5px}}.chg{{color:#e8590c;font-weight:600}}
 svg{{width:100%;display:block}}footer{{margin-top:10px;color:#444;font-size:10px;line-height:1.45}}footer b{{color:#111}}
 .legend{{display:flex;gap:12px;margin-top:6px}}.legend span{{display:inline-flex;align-items:center;gap:4px}}.legend i{{display:inline-block;width:14px;height:10px;border:1px solid #999;border-radius:2px}}
-</style><header><h1>{head}</h1><p>{"read off the board " + d["savedAt"][:10] if "savedAt" in d else "target, not yet on the board"}</p></header>
+</style><header><h1>{head}</h1><p>{"read off the board " + datetime.fromisoformat(d["savedAt"].replace("Z", "+00:00")).astimezone().strftime("%Y-%m-%d") if "savedAt" in d else "target, not yet on the board"}</p></header>
 <div class="grid">{body}</div><footer>{notes}
 <div class="legend"><span><i style="background:#ececec"></i>modifier / layer</span><span><i style="background:#e3edf9;border-color:#8fb0d8"></i>action</span><span><i style="background:#222;border-color:#222"></i>held to reach this layer</span><span><i style="border-style:dashed"></i>pass-through</span><span><i style="border:2px solid #e8590c"></i>changes</span></div>
 </footer>''')

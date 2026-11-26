@@ -9,7 +9,9 @@ Master (Kara, HHKB) position -> Neo Ergo matrix:
   row 3: Shift Z X C V B -> r3 c1-c6; N M , . / Shift Fn -> r3 c8-c14 (r3c7 is the right-hand B)
   row 4: ⌥ ⌘ -> r4c2 r4c3; Space -> both halves r4c6 r4c7; ⌘ -> r4c10; ⌃ -> r4c14 (keeps its → tap)
 Board-only keys: the left column r1c0-r4c0, left ⌃ r4c1, right-hand B r3c7, ← / hold ⌥ r4c12.
-Layers: 0 Base, 1 Fn, 2 Nav, 3 Lighting (rgblight underglow). Macros are left as they are."""
+Layers: 0 Base, 1 Nav, 2 Fn, 3 Lighting (rgblight underglow). Nav sits below Fn so that with one Space half held
+(Nav), holding the other half (tap Backspace, hold Fn) gives the whole Fn layer: the higher layer wins.
+Macros are left as they are."""
 import json, sys, copy
 BACKUP, OUT = sys.argv[1:3]
 src = json.load(open(BACKUP))
@@ -29,7 +31,9 @@ def mt(mods, k): return 0x2000 | mods << 8 | K[k]   # mods: 1 ⌃ 2 ⇧ 4 ⌥ 8 
 def lt(layer, k): return 0x4000 | layer << 8 | K[k]
 def mo(layer): return 0x5220 | layer
 def k(x): return K[x] if isinstance(x, str) else x
-SPC_NAV, SPC_LIGHT, CMD_H = lt(2, 'Space'), lt(3, 'Space'), 0x0800 | K['H']
+NAV, FN = 1, 2
+SPC_NAV, SPC_LIGHT, CMD_H = lt(NAV, 'Space'), lt(3, 'Space'), 0x0800 | K['H']
+BKSP_FN = lt(FN, 'Bksp')                    # on Nav: the other Space half
 
 def neo(rows, left_col, extra):
     """rows: the master's 5 rows (HHKB positions, same shape as the master page); returns a 5x15 Neo matrix.
@@ -56,9 +60,9 @@ base = neo([
     ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', 'Bksp'],
     [mt(0x0f, 'Esc'), mt(2, 'A'), mt(1, 'S'), mt(4, 'D'), mt(8, 'F'), mt(0x0f, 'G'),
      mt(0x0f, 'H'), mt(0x18, 'J'), mt(0x14, 'K'), mt(0x11, 'L'), mt(0x12, ';'), "'", mt(0x0f, 'Enter')],
-    ['LSft', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'RSft', mo(1)],
+    ['LSft', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'RSft', mo(FN)],
     ['LAlt', 'LGui', SPC_NAV, SPC_NAV, 'RGui', mt(0x11, '→')]],
-    ['Vol+', 'Vol−', lt(1, '⏯'), mo(1)],
+    ['Vol+', 'Vol−', lt(FN, '⏯'), mo(FN)],
     {(4, 1): 'LCtl', (3, 7): 'B', (4, 12): mt(0x14, '←')})
 
 fn = neo([
@@ -68,14 +72,14 @@ fn = neo([
     [T, '\\', '|', ':', '<', ';', '=', '>', '?', '.', '↓', 'Vol+', T],
     [T, T, SPC_LIGHT, SPC_LIGHT, 'Mute', 'Vol−']],
     ['⏭', '⏮', T, T],
-    {(3, 7): ';', (3, 14): mo(1)})            # Fn stays Fn while held
+    {(3, 7): ';', (3, 14): mo(FN)})            # Fn stays Fn while held
 
 nav = neo([
     ['Bksp'] + [T] * 14,
     [CMD_H, 'Home', '↑', 'End', T, T, '*', '7', '8', '9', '-', T, T, T],
     ['Enter', '←', '↓', '→', T, T, '/', '4', '5', '6', '+', T, T],
     [T, 'PgUp', T, 'PgDn', T, T, '0', '1', '2', '3', '=', T, T],
-    [T, T, 'Bksp', 'Bksp', '.', T]],          # with one Space half held, the other is Backspace
+    [T, T, BKSP_FN, BKSP_FN, '.', T]],        # with one Space half held, the other is Backspace / hold Fn
     [T, T, T, T], {})
 
 light = neo([
@@ -88,9 +92,10 @@ light = neo([
 
 # Matrix spots with no key in this layout keep whatever the board has now.
 NOKEY = [(0, 7), (4, 0 + 4), (4, 5), (4, 8), (4, 9), (4, 11), (4, 13)]
-layers = [base, fn, nav, light]
+layers = [base, nav, fn, light]
+SRC_LAYER = [0, 2, 1, 3]                    # the backup's layers were 0 Base, 1 Fn, 2 Nav, 3 Lighting
 for l, m in enumerate(layers):
-    for r, c in NOKEY: m[r][c] = src['keymap'][l][r][c]
+    for r, c in NOKEY: m[r][c] = src['keymap'][SRC_LAYER[l]][r][c]
 out = copy.deepcopy(src)
 out['keymap'] = layers
 out.pop('savedAt', None); out['note'] = 'master keymap target for the Neo Ergo (wired); macros kept from the backup'
