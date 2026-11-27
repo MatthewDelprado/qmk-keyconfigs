@@ -79,9 +79,10 @@ fn = layer(
     [T, T], ['^', T])
 
 nav = layer(
-    [[CMD_H, 'Home', '↑', 'End', T, T],
-     ['Enter', '←', '↓', '→', T, T],
-     [T, 'PgUp', T, 'PgDn', T, T]],
+    # Corne only (2026-11-28): the cluster sits one key right of the master, so → is on F; ⌘H and Enter stay.
+    [[CMD_H, T, 'Home', '↑', 'End', T],
+     ['Enter', T, '←', '↓', '→', T],
+     [T, T, 'PgUp', T, 'PgDn', T]],
     [['*', '7', '8', '9', '-', 'Del'],
      ['/', '4', '5', '6', '+', T],
      ['0', '1', '2', '3', '=', T]],

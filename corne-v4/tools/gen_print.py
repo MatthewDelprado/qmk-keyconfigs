@@ -105,7 +105,7 @@ if MODE == 'master':
             + board(3, 'Lighting', 'hold Fn, then either inner thumb', {(7, 4): 'Fn', (3, 5): 'Space'}))
     notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
 Same rules as the master: home row mods (A ⇧, S ⌃, D ⌥, F ⌘ / J ⌘, K ⌥, L ⌃, ; ⇧), Hyper on Esc, Enter, G and H, symbols on Fn with mirrored brackets, HHKB arrows on Fn,
-numpad on Nav. Both inner thumbs are Space and hold Nav; with one held, the other is Backspace on a tap and Fn on a hold. The Corne has no ' [ ] column,
+numpad on Nav. The Nav arrows sit one key right of the master, so → is on F. Both inner thumbs are Space and hold Nav; with one held, the other is Backspace on a tap and Fn on a hold. The Corne has no ' [ ] column,
 so ' is Fn + G (as on every 40%). The extra keys are media: ⏯ and ⏭ on the left, Vol + and Vol − on the right. Fn + Space opens lighting, like Fn + Space on the master.'''
 elif MODE == 'split':
     head = 'Corne v4 · master keymap, split thumbs (trial)'
@@ -114,7 +114,7 @@ elif MODE == 'split':
             + board(1, 'Nav', 'hold either middle thumb (Space)', {(3, 4): 'Space'})
             + board(3, 'Lighting', 'hold Fn (Enter thumb), then the Backspace thumb', {(7, 5): 'Fn', (3, 5): 'Bksp'}))
     notes = '''<b>Small text</b> is the hold action; the corner legend is what Shift + that key types. Dashed keys pass through to Base.
-Same letters, mods and layers as the master; only the thumbs differ. Left to right: ⌘ ⌘, Space / Nav, Backspace | Enter / Fn, Space / Nav, ⇧ ⇧.
+Same letters, mods and layers as the master, except the thumbs and the Nav cluster, which sits one key right (→ on F). Left to right: ⌘ ⌘, Space / Nav, Backspace | Enter / Fn, Space / Nav, ⇧ ⇧.
 The outer thumbs are Vial macros 0 and 1: one press taps left ⌘ (or left ⇧) twice, 20 ms apart, for double-tap hotkeys. They don't hold as modifiers;
 the home row mods do that. Fn is held on the Enter thumb, and Fn + the Backspace thumb opens lighting. On Nav the inner thumbs are Backspace, the other Space thumb is Backspace on a tap and Fn on a hold, and right outer is “.”.
 The standard thumbs (⌥ ⌘ Space | Space Fn ⌘, closest to the other boards) are kept in corne-v4-matt-target-standard-thumbs.json.'''

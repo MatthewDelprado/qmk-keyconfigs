@@ -17,6 +17,8 @@ Since 2026-11-27 it runs our own build of the factory Vial firmware with a layer
 - Switch between them with `node ../qk-alice/tools/apply.cjs <target>`; it also rewrites the macro buffer.
 
 Hyper on G and H as well as Esc and Enter (master rule, 2026-11-25).
+Nav cluster one key right of the master (Corne only, 2026-11-28): ← ↓ → on S D F, ↑ on E, Home W, End R, PgUp X, PgDn V;
+⌘H and Enter stay on Tab and Esc, and Q A Z are empty on Nav. Readback: `backup/corne-v4-vial-split-thumbs-nav-right-2026-11-28.json`.
 Layers: 0 Base, 1 Nav (hold a Space thumb), 2 Fn, 3 Lighting (from Fn). Standard thumbs: Fn is the right middle thumb, Nav either inner thumb.
 With one Space thumb held for Nav, the other Space thumb is Backspace on a tap and Fn on a hold. Nav sits below Fn on purpose:
 the higher layer wins, so holding both Space thumbs gives the whole Fn layer. (Fn and Nav swapped numbers on 2026-11-27; the
