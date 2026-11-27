@@ -1,0 +1,8 @@
+{
+  "name": "Corne v4",
+  "vendorId": "0x4653",
+  "productId": "0x0004",
+  "layout": "corne-v4.layout.json",
+  "layerNames": { "0": "Base", "1": "Nav", "2": "Fn", "3": "Lighting" },
+  "macroNames": { "0": "⌘ ⌘", "1": "⇧ ⇧" }
+}
