@@ -1,7 +1,9 @@
 # Corne v4 (foostan, v4.1, Vial)
 
 USB 0x4653:0x0004, Vial protocol 6 (modern QMK keycodes), 8x7 matrix, 6 layers, VialRGB.
-Edited live over VIA with the tools in `../qk-alice/tools` (VID=0x4653 PID=0x0004 ROWS=8 COLS=7); no firmware build.
+Edited live over VIA with the tools in `../qk-alice/tools` (VID=0x4653 PID=0x0004 ROWS=8 COLS=7).
+Since 2026-11-27 it runs our own build of the factory Vial firmware with a layer report for the Layer Overlay app
+(`firmware/`, `../layer-overlay`); factory backups of both halves are in `firmware/backup/`.
 
 - `backup/corne-v4-vial-backup-2026-11-25.json`: the factory keymap as it arrived (picture: `KEYMAP-current.pdf`).
   Put it back with `node ../qk-alice/tools/apply.cjs backup/corne-v4-vial-backup-2026-11-25.json`.
