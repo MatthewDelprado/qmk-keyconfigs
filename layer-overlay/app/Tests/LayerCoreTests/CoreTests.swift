@@ -307,6 +307,38 @@ final class FakePresenter: OverlayPresenting {
         #expect(p.shown.count == 1)
     }
 
+    @Test func quietLayerNeverShows() {
+        let (c, p) = make(delay: 1)
+        c.quietLayers = [1]
+        send(c, "LAYER 1 00000002\n", at: 0)
+        c.tick(at: 5)
+        #expect(p.shown.isEmpty)
+        #expect(c.nextDeadline == nil)
+    }
+
+    @Test func movingIntoAQuietLayerHides() {
+        let (c, p) = make(delay: 1)
+        c.quietLayers = [2]
+        send(c, "LAYER 1 00000002\n", at: 0)
+        c.tick(at: 1)
+        send(c, "LAYER 2 00000006\n", at: 2)
+        #expect(p.shown.map(\.layerName) == ["Nav"])
+        #expect(p.hides == 1)
+        send(c, "LAYER 1 00000002\n", at: 3)   // back to Nav: waits again
+        c.tick(at: 3.5)
+        #expect(p.shown.count == 1)
+        c.tick(at: 4)
+        #expect(p.shown.map(\.layerName) == ["Nav", "Nav"])
+    }
+
+    @Test func quietingTheShownLayerHidesIt() {
+        let (c, p) = make(delay: 1)
+        send(c, "LAYER 1 00000002\n", at: 0)
+        c.tick(at: 1)
+        c.quietLayers = [1]
+        #expect(p.hides == 1)
+    }
+
     @Test func unplugHides() {
         let (c, p) = make(delay: 1)
         send(c, "LAYER 1 00000002\n", at: 0)

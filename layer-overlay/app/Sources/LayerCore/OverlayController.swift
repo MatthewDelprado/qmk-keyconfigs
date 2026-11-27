@@ -60,6 +60,11 @@ public final class OverlayController {
     public weak var presenter: OverlayPresenting?
     public var keymap: Keymap? { didSet { refresh() } }
     public var ghosts = true { didSet { refresh() } }
+    /// Layers that never get the overlay. Holding one counts as being on Base: nothing shows, and
+    /// moving into it from a shown layer hides the overlay.
+    public var quietLayers: Set<Int> = [] {
+        didSet { if let s = timer.shown, quietLayers.contains(Int(s)), let out = timer.layerChanged(0, at: 0) { apply(out) } }
+    }
     public var delay: Double {
         get { timer.delay }
         set { timer.delay = newValue }
@@ -86,7 +91,8 @@ public final class OverlayController {
     public func handle(_ e: LayerEvent, at t: Double) {
         let before = last
         last = e
-        if let out = timer.layerChanged(e.highest, at: t) { apply(out) }
+        let layer = quietLayers.contains(Int(e.highest)) ? 0 : e.highest
+        if let out = timer.layerChanged(layer, at: t) { apply(out) }
         else if timer.shown == e.highest, before != e { refresh() }   // same layer, different stack: redraw
     }
 

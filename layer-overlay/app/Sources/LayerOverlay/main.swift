@@ -60,6 +60,8 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     var delay: Double { defaults.object(forKey: "holdDelay") as? Double ?? 3.0 }
     var ghosts: Bool { defaults.object(forKey: "ghosts") as? Bool ?? true }
+    /// Per board: layers that don't get the overlay (menu: "Show overlay for").
+    func quietLayers(_ board: String) -> Set<Int> { Set(defaults.array(forKey: "quietLayers.\(board)") as? [Int] ?? []) }
 
     func applicationDidFinishLaunching(_ n: Notification) {
         panel.position = OverlayPanel.Position(rawValue: defaults.string(forKey: "position") ?? "") ?? .bottom
@@ -73,6 +75,7 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let c = OverlayController(profile: p, delay: delay)
             c.presenter = panel
             c.ghosts = ghosts
+            c.quietLayers = quietLayers(p.id)
             let w = ConsoleWatcher(profile: p)
             w.onReport = { [weak self, weak c] bytes in
                 c?.consoleReport(bytes, at: ProcessInfo.processInfo.systemUptime)
@@ -138,6 +141,19 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         let d = NSMenuItem(title: "Show after holding", action: nil, keyEquivalent: ""); d.submenu = delayMenu
         menu.addItem(d)
+        for (bi, (c, _)) in boards.enumerated() {
+            let layers = c.keymap.map { 1..<$0.layers.count } ?? 1..<(max(2, (c.profile.labeler.layerNames.keys.max() ?? 1) + 1))
+            let sub = NSMenu()
+            for l in layers {
+                let i = NSMenuItem(title: c.profile.labeler.layerName(l), action: #selector(toggleLayer(_:)), keyEquivalent: "")
+                i.target = self; i.tag = bi * 100 + l
+                i.state = c.quietLayers.contains(l) ? .off : .on
+                sub.addItem(i)
+            }
+            let title = boards.count > 1 ? "Show overlay for (\(c.profile.name))" : "Show overlay for"
+            let item = NSMenuItem(title: title, action: nil, keyEquivalent: ""); item.submenu = sub
+            menu.addItem(item)
+        }
         add(menu, "Base-key ghosts", #selector(toggleGhosts), on: ghosts)
         add(menu, "Show at top of screen", #selector(togglePosition), on: panel.position == .top)
 
@@ -169,6 +185,13 @@ final class App: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func setDelay(_ i: NSMenuItem) {
         defaults.set(Double(i.tag), forKey: "holdDelay")
         boards.forEach { $0.controller.delay = Double(i.tag) }
+    }
+    @objc func toggleLayer(_ i: NSMenuItem) {
+        let c = boards[i.tag / 100].controller, l = i.tag % 100
+        var q = c.quietLayers
+        if q.contains(l) { q.remove(l) } else { q.insert(l) }
+        c.quietLayers = q
+        defaults.set(q.sorted(), forKey: "quietLayers.\(c.profile.id)")
     }
     @objc func toggleGhosts() {
         defaults.set(!ghosts, forKey: "ghosts")

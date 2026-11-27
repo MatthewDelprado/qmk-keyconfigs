@@ -1,12 +1,15 @@
 #!/bin/sh
 # Builds "Layer Overlay.app" into ./build. Needs Xcode or the Swift toolchain (Swift 5.10+), macOS 14+.
-#   ./bundle.sh            build only
+#   ./bundle.sh            build only (into ~/Library/Caches/layer-overlay)
 #   ./bundle.sh --install  also copy it to ~/Applications (needed for "Open at login")
+# Builds outside the repo: when Documents syncs with iCloud, new folders get Finder attributes that
+# code signing rejects. Set LAYER_OVERLAY_BUILD to build somewhere else.
 set -eu
 cd "$(dirname "$0")"
-swift build -c release
-BIN=$(swift build -c release --show-bin-path)
-APP="build/Layer Overlay.app"
+OUT="${LAYER_OVERLAY_BUILD:-$HOME/Library/Caches/layer-overlay}"
+swift build -c release --scratch-path "$OUT/build"
+BIN=$(swift build -c release --scratch-path "$OUT/build" --show-bin-path)
+APP="$OUT/Layer Overlay.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/LayerOverlay" "$APP/Contents/MacOS/"

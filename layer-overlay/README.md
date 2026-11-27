@@ -27,14 +27,16 @@ Boards using it: Corne v4 (`../corne-v4/firmware/build.sh`).
 
 ```sh
 cd app
-swift test               # 31 tests: console parsing, hold timing, VIA reads, labels, layout, overlay renders
+./test.sh                # the tests: console parsing, hold timing, VIA reads, labels, layout, overlay renders
 ./bundle.sh --install    # builds "Layer Overlay.app" and copies it to ~/Applications
 ```
 
-Needs Xcode (or the Swift 5.10+ toolchain) and macOS 14+. Nothing in it is tied to one Mac, so it builds the same
+Needs Xcode (or the Swift 5.10+ toolchain) and macOS 14+. Both scripts build in `~/Library/Caches/layer-overlay`,
+outside the repo, because iCloud-synced folders get Finder attributes that code signing rejects; plain `swift test`
+in the repo can fail with "resource fork, Finder information, or similar detritus". Nothing in it is tied to one Mac, so it builds the same
 anywhere the repo is cloned. It's ad-hoc signed, which is fine for your own Macs.
 
-Menu: which boards are connected, the hold delay (1–5 s), ghosts on/off, top or bottom of the screen, a preview of each
+Menu: which boards are connected, which layers get the overlay, the hold delay (1–5 s), ghosts on/off, top or bottom of the screen, a preview of each
 layer, reload keymap, open at login.
 
 Command line, for testing without the menu:
@@ -42,7 +44,7 @@ Command line, for testing without the menu:
 - `LayerOverlay --listen corne-v4 [seconds]` connects to the board's console the same way the app does and prints what arrives.
 - `LayerOverlay --dump-keymap corne-v4` reads the keymap from the board (read-only) and prints JSON.
 - `LayerOverlay --render corne-v4 2 out.png keymap.json` draws the overlay for a layer to a PNG.
-- `SNAPSHOT_DIR=/some/dir swift test` keeps the rendered overlays from the tests.
+- `SNAPSHOT_DIR=/some/dir ./test.sh` keeps the rendered overlays from the tests.
 
 ### Adding a board
 
